@@ -9,6 +9,10 @@
   box-sizing: border-box;
 }
 
+html {
+  font-size: 93.75%;
+}
+
 body {
   background: #f2f0f5;
   font-family: 'Poppins', sans-serif;
@@ -124,6 +128,11 @@ header {
 table thead th:first-child,
 table tbody td:first-child {
   border-radius: 0.25rem 0 0 0.25rem;
+}
+
+table thead th:last-child,
+table tbody td:last-child {
+  border-radius: 0 0.25rem 0.25rem 0;
 }
 
 table thead th {
