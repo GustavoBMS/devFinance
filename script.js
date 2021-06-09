@@ -45,14 +45,17 @@ const DOM = {
     tr.innerHTML = DOM.innerHTMLTransaction(transaction);
 
     DOM.transactionsContainer.appendChild(tr);
-    console.log(tr.innerHTML)
   },
 
   innerHTMLTransaction(transaction) {
+    const cssClass = transaction.amount > 0 ? "income" : "expense";
+
+    const amount = Utils.formatCurrency(transaction.amount);
+
     const html = `
     <tr>
       <td class="description">${transaction.description}</td>
-      <td class="expense">${transaction.amount}</td>
+      <td class="${cssClass}">${amount}</td>
       <td class="date">${transaction.date}</td>
       <td>
         <img src="./assets/minus.svg" alt="Remover transação">
@@ -61,6 +64,24 @@ const DOM = {
     `
 
     return html;
+  }
+}
+
+const Utils = {
+  formatCurrency(value) {
+    const signal = Number(value) < 0 ? "-" : "";
+
+    value = String(value).replace(/\D/g, "");
+
+    // Faz com que os numeros fiquem com casas decimais de moedas
+    value = Number(value) / 100;
+
+    value = value.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    })
+
+    return signal + value;
   }
 }
 
