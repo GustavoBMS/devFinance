@@ -27,13 +27,39 @@ const transactions = [
 
 const Transaction = {
   incomes() {
+    let income = 0;
 
+    // Verifica se a transação é maior que 0 para calcular a entrada
+    transactions.map(transaction => {
+      if(transaction.amount > 0) {
+        /*  
+            += faz com que a variavel some a ela mesma e adicione o valor a seguir
+            a mesma coisa que income = income + transaction.amount
+        */
+        income += transaction.amount;
+      }
+    })
+
+    return income
   },
   expenses() {
-    
+    let expense = 0;
+
+    transactions.map(transaction => {
+      if(transaction.amount < 0) {
+        /*  
+            += faz com que a variavel some a ela mesma e adicione o valor a seguir
+            a mesma coisa que income = income + transaction.amount
+        */
+        expense += transaction.amount;
+      }
+    })
+
+    return expense
   },
   total() {
-
+    // Soma entrada e saida para gerar o valor total
+    return Transaction.incomes() + Transaction.expenses()
   }
 }
 
@@ -64,6 +90,21 @@ const DOM = {
     `
 
     return html;
+  },
+
+  updateBalance() {
+    document
+      .getElementById("incomeDisplay")
+      .innerHTML = Utils.formatCurrency(Transaction.incomes());
+
+    document
+    .getElementById("expenseDisplay")
+    .innerHTML = Utils.formatCurrency(Transaction.expenses());
+
+    document
+    .getElementById("totalDisplay")
+    .innerHTML = Utils.formatCurrency(Transaction.total());
+
   }
 }
 
@@ -88,3 +129,5 @@ const Utils = {
 transactions.map((transaction, index) => {
   DOM.addTransction(transaction);
 });
+
+DOM.updateBalance();
