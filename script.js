@@ -4,26 +4,18 @@ const Modal = {
   }
 }
 
-const transactions = [
-  {
-    description: 'Luz',
-    amount: -50000,
-    date: '23/01/2021'
+const Storage = {
+  get() {
+    return JSON.parse(localStorage.getItem('dev.finances:transactions')) || [];
   },
-  {
-    description: 'Website',
-    amount: 500000,
-    date: '23/01/2021'
-  },
-  {
-    description: 'Internet',
-    amount: -20000,
-    date: '23/01/2021'
-  },
-]
+
+  set(transactions) {
+    localStorage.setItem("dev.finances:transactions", JSON.stringify(transactions));
+  }
+}
 
 const Transaction = {
-  all: transactions,
+  all: Storage.get(),
   add(transaction){
     Transaction.all.push(transaction)
     App.reload();
@@ -39,7 +31,7 @@ const Transaction = {
     let income = 0;
 
     // Verifica se a transação é maior que 0 para calcular a entrada
-    transactions.map(transaction => {
+    Transaction.all.map(transaction => {
       if(transaction.amount > 0) {
         /*  
             += faz com que a variavel some a ela mesma e adicione o valor a seguir
@@ -54,7 +46,7 @@ const Transaction = {
   expenses() {
     let expense = 0;
 
-    transactions.map(transaction => {
+    Transaction.all.map(transaction => {
       if(transaction.amount < 0) {
         /*  
             += faz com que a variavel some a ela mesma e adicione o valor a seguir
@@ -77,12 +69,13 @@ const DOM = {
 
   addTransction(transaction, index){
     const tr = document.createElement('tr');
-    tr.innerHTML = DOM.innerHTMLTransaction(transaction);
+    tr.innerHTML = DOM.innerHTMLTransaction(transaction, index);
+    tr.dataset.index = index;
 
     DOM.transactionsContainer.appendChild(tr);
   },
 
-  innerHTMLTransaction(transaction) {
+  innerHTMLTransaction(transaction, index) {
     const cssClass = transaction.amount > 0 ? "income" : "expense";
 
     const amount = Utils.formatCurrency(transaction.amount);
@@ -93,7 +86,7 @@ const DOM = {
       <td class="${cssClass}">${amount}</td>
       <td class="date">${transaction.date}</td>
       <td>
-        <img src="./assets/minus.svg" alt="Remover transação">
+        <img onclick="Transaction.remove(${index})" src="./assets/minus.svg" alt="Remover transação">
       </td>
     </tr>
     `
@@ -107,12 +100,12 @@ const DOM = {
       .innerHTML = Utils.formatCurrency(Transaction.incomes());
 
     document
-    .getElementById("expenseDisplay")
-    .innerHTML = Utils.formatCurrency(Transaction.expenses());
+      .getElementById("expenseDisplay")
+      .innerHTML = Utils.formatCurrency(Transaction.expenses());
 
     document
-    .getElementById("totalDisplay")
-    .innerHTML = Utils.formatCurrency(Transaction.total());
+      .getElementById("totalDisplay")
+      .innerHTML = Utils.formatCurrency(Transaction.total());
 
   },
 
@@ -212,8 +205,8 @@ const Form = {
 
       //  Fecha o Modal
       Modal.toggleModal();
-    } catch(e) {
-
+    } catch(error) {
+      alert(error.message);
     }
 
   }
@@ -221,11 +214,11 @@ const Form = {
 
 const App = {
   init() {
-    Transaction.all.map((transaction, index) => {
-      DOM.addTransction(transaction);
-    });
+    Transaction.all.map(DOM.addTransction);
     
     DOM.updateBalance();
+
+    Storage.set(Transaction.all);
   },
   reload() {
     // Remove tudo antes de renderizar
